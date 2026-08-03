@@ -4,11 +4,13 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <mutex>
 using namespace std;
 
 class HashIndex {
 private:
     unordered_map<string, string> store;
+    mutable mutex mtx;
 
 public:
     void put(string key, string value);
