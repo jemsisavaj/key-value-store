@@ -5,6 +5,8 @@
 #include <string>
 #include <fstream>
 #include <mutex>
+#include <utility>
+#include <vector>
 using namespace std;
 
 class FileHandler{
@@ -18,6 +20,8 @@ public:
     ~FileHandler();
 
     bool appendRecord(const string& key, const string& value);
+
+    vector<pair<string,string>> readAllRecords();
 };
 
 #endif

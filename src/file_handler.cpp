@@ -1,4 +1,5 @@
 #include "../include/file_handler.hpp"
+#include <sstream>
 
 FileHandler::FileHandler(const string& filename) : filePath(filename){
     writeStream.open(filePath, ios::out | ios::app);
@@ -20,4 +21,26 @@ bool FileHandler::appendRecord(const string& key, const string& value){
     writeStream << key << "|" << value << "\n";
     writeStream.flush();
     return true;
+}
+
+vector<pair<string,string>> FileHandler::readAllRecords(){
+    lock_guard<mutex> lock(mtx);
+    vector<pair<string,string>> records;
+
+    ifstream readStream(filePath);
+    if(!readStream.is_open()){
+        return records;
+    }
+
+    string line;
+    while(getline(readStream, line)){
+        stringstream ss(line);
+        string key, value;
+
+        if(getline(ss, key, '|') && getline(ss, value)){
+            records.push_back({key, value});
+        }
+    }
+    readStream.close();
+    return records;
 }

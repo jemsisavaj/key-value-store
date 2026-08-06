@@ -3,19 +3,23 @@
 #include "../include/file_handler.hpp"
 
 int main(){
-    HashIndex mystore;
+    HashIndex memoryStore;
     FileHandler diskStore("data.dat");
 
-    string key = "user";
-    string value = "Jemsi";
-
-    mystore.put(key, value);
-
-    if(diskStore.appendRecord(key,value)){
-        cout << "Data saved to memory and written to file (data.dat)!" << endl;
+    auto saveRecords = diskStore.readAllRecords();
+    for(const auto& record : saveRecords){
+        memoryStore.put(record.first, record.second);
     }
 
-    cout << "GET from Memory : " << mystore.get(key) << endl; 
+    cout << "Loaded " << saveRecords.size() << " records from file to memory!" << endl;
+
+    string key = "course";
+    string value = "BTech_computer";
+
+    memoryStore.put(key, value);
+    diskStore.appendRecord(key, value);
+
+    cout << "GET course from Memory : " << memoryStore.get("course") << endl; 
 
     return 0;
 }
