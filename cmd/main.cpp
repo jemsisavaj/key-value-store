@@ -1,29 +1,20 @@
 #include <iostream>
-#include "../include/hash_index.hpp"
-#include "../include/file_handler.hpp"
+#include "../include/kv_store.hpp"
+using namespace std;
 
 int main(){
-    HashIndex memoryStore;
-    FileHandler diskStore("data.dat");
+    KeyValueStore store("data.dat");
 
-    auto saveRecords = diskStore.readAllRecords();
-    for(const auto& record : saveRecords){
-        memoryStore.put(record.first, record.second);
-    }
+    store.put("role", "Developer");
+    store.put("city", "Ahmedabad");
 
-    cout << "Loaded " << saveRecords.size() << " records from file to memory!" << endl;
+    cout << "GET role: " << store.get("role") << endl;
+    cout << "GET city: " << store.get("city") << endl;
 
-    memoryStore.put("tempKey", "to_be_deleted");
-    diskStore.appendRecord("tempKey", "to_be_deleted");
+    store.del("role");
+    store.compact();
 
-    memoryStore.put("name", "Jemsi");
-    diskStore.appendRecord("name", "Jemsi");
-
-    memoryStore.del("tempKey");
-
-    cout << "Running Compaction..." << endl;
-    diskStore.rewriteAllRecords(memoryStore.getAll());
-    cout << "Compaction Done! Clean data saved to file." << endl;
+    cout << "GET role (after delete): " << store.get("role") << endl;
 
     return 0;
 }
