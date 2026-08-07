@@ -13,13 +13,17 @@ int main(){
 
     cout << "Loaded " << saveRecords.size() << " records from file to memory!" << endl;
 
-    string key = "course";
-    string value = "BTech_computer";
+    memoryStore.put("tempKey", "to_be_deleted");
+    diskStore.appendRecord("tempKey", "to_be_deleted");
 
-    memoryStore.put(key, value);
-    diskStore.appendRecord(key, value);
+    memoryStore.put("name", "Jemsi");
+    diskStore.appendRecord("name", "Jemsi");
 
-    cout << "GET course from Memory : " << memoryStore.get("course") << endl; 
+    memoryStore.del("tempKey");
+
+    cout << "Running Compaction..." << endl;
+    diskStore.rewriteAllRecords(memoryStore.getAll());
+    cout << "Compaction Done! Clean data saved to file." << endl;
 
     return 0;
 }

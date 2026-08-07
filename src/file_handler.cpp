@@ -44,3 +44,26 @@ vector<pair<string,string>> FileHandler::readAllRecords(){
     readStream.close();
     return records;
 }
+
+bool FileHandler::rewriteAllRecords(const vector<pair<string, string>>& records){
+    lock_guard<mutex> lock(mtx);
+
+    if(writeStream.is_open()){
+        writeStream.close();
+    }
+
+    writeStream.open(filePath, ios::out | ios::trunc);
+    if(!writeStream.is_open()){
+        return false;
+    }
+
+    for(const auto& record : records){
+        writeStream << record.first << "|" << record.second << "\n";
+    }
+
+    writeStream.flush();
+    writeStream.close();
+
+    writeStream.open(filePath, ios::out | ios::app);
+    return true;
+}

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
+#include <utility>
 #include <mutex>
 using namespace std;
 
@@ -16,6 +18,9 @@ public:
     void put(string key, string value);
     string get(string key);
     void del(string key);
+    
+
+    vector<pair<string, string>> getAll();
 };
 
 #endif

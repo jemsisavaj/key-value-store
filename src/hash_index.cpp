@@ -17,3 +17,12 @@ void HashIndex::del(string key){
     lock_guard<mutex> lock(mtx);
     store.erase(key);
 }
+
+vector<pair<string, string>> HashIndex::getAll(){
+    lock_guard<mutex> lock(mtx);
+    vector<pair<string, string>> allData;
+    for(const auto& pair : store){
+        allData.push_back(pair);
+    }
+    return allData;
+}
