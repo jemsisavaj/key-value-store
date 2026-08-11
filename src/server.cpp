@@ -39,6 +39,7 @@ void Server::start(){
     cout << "       Server Listening on port         " << endl;
     cout << "========================================" << endl;
 
+while(true){
 #ifdef _WIN32
     int addrlen = sizeof(address);
     int newSocket = accept(serverFd, (struct sockaddr*)&address, &addrlen);
@@ -77,14 +78,20 @@ void Server::start(){
         send(newSocket, response.c_str(), response.length(), 0);
 
 #ifdef _WIN32
-        closesocket(newSocket);
-        closesocket(serverFd);
-        WSACleanup();
+            closesocket(newSocket);
 #else
-        close(newSocket);
-        close(serverFd);
+            close(newSocket);
+#endif
+        }
+    }
+
+#ifdef _WIN32
+    closesocket(serverFd);
+    WSACleanup();
+#else
+    close(serverFd);
 #endif
 }
-}
+
     
     
