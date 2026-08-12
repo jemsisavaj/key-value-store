@@ -1,10 +1,55 @@
 #include "../include/server.hpp"
 #include <sstream>
+#include <thread>
 
 using namespace std;
 
 Server::Server(int p, KeyValueStore& kvs) : port(p), store(kvs) {}
 
+void Server::handleClient(int newSocket){
+    char buffer[1024] = {0};
+
+
+#ifdef _WIN32
+        recv(newSocket, buffer, 1024, 0);
+#else
+        read(newSocket, buffer, 1024);
+#endif
+
+        string input(buffer);
+        stringstream ss(input);
+        string command, key, value, response;
+
+        ss >> command;
+
+        if (command == "GET" && ss >> key) {
+            response = store.get(key) + "\n";
+        } 
+        else if (command == "SET" && ss >> key >> value) {
+            store.put(key, value);
+            response = "OK\n";
+        } 
+        else if(command == "DEL" && ss >> key >> value){
+            store.del(key);
+            response = "DELETED\n";
+        }
+        else if(command == "COMPACT"){
+            store.compact();
+            response = "COMPACTED\n";
+        }
+        else {
+            response = "UNKNOWN_COMMAND\n";
+        }
+
+        send(newSocket, response.c_str(), response.length(), 0);
+
+#ifdef _WIN32
+            closesocket(newSocket);
+#else
+            close(newSocket);
+#endif
+}
+    
 void Server::start(){
 #ifdef _WIN32
     WSADATA wsaData;
@@ -30,14 +75,14 @@ void Server::start(){
     }
 
 //listen
-    if(listen(serverFd, 3) < 0){
+    if(listen(serverFd, 20) < 0){
         cout << "ERROR: Listen failed!" << endl;
         return;
     }
 
-    cout << "========================================" << endl;
-    cout << "       Server Listening on port         " << endl;
-    cout << "========================================" << endl;
+    cout << "=======================================================" << endl;
+    cout << "       Multi-Threaded Server Listening on port         " << endl;
+    cout << "=======================================================" << endl;
 
 while(true){
 #ifdef _WIN32
@@ -48,42 +93,10 @@ while(true){
     int newSocket = accept(serverFd, (struct sockaddr*)&address, &addrlen);
 #endif
     if (newSocket >= 0) {
-        cout << "Client connected successfully!" << endl;
-        char buffer[1024] = {0};
-    
-
-#ifdef _WIN32
-        recv(newSocket, buffer, 1024, 0);
-#else
-        read(newSocket, buffer, 1024);
-#endif
-
-        string input(buffer);
-        stringstream ss(input);
-        string command, key, value, response;
-
-        ss >> command;
-
-        if (command == "GET" && ss >> key) {
-            response = store.get(key) + "\n";
-        } 
-        else if (command == "SET" && ss >> key >> value) {
-            store.put(key, value);
-            response = "OK\n";
-        } 
-        else {
-            response = "UNKNOWN_COMMAND\n";
-        }
-
-        send(newSocket, response.c_str(), response.length(), 0);
-
-#ifdef _WIN32
-            closesocket(newSocket);
-#else
-            close(newSocket);
-#endif
-        }
+        thread clientThread(&Server::handleClient, this, newSocket);
+        clientThread.detach();
     }
+}
 
 #ifdef _WIN32
     closesocket(serverFd);

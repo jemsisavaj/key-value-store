@@ -21,6 +21,8 @@ private:
     int port;
     KeyValueStore& store;
 
+    void handleClient(int newSocket);
+
 public:
     Server(int p, KeyValueStore& kvs);
     void start();
