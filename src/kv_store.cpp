@@ -9,8 +9,8 @@ KeyValueStore::KeyValueStore(const string& filename) : diskStore(filename){
     }
 }
 
-void KeyValueStore::put(const string& key, const string& value){
-    memoryStore.put(key, value);
+void KeyValueStore::put(const string& key, const string& value, int ttlInSeconds){
+    memoryStore.put(key, value, ttlInSeconds);
     diskStore.appendRecord(key, value);
 }
 

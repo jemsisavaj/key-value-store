@@ -14,7 +14,7 @@ private:
 public:
     KeyValueStore(const string& filename);
 
-    void put(const string& key, const string& value);
+    void put(const string& key, const string& value, int ttlInSeconds = 0);
     string get(const string& key);
     void del(const string& key);
     void compact();

@@ -26,7 +26,14 @@ void Server::handleClient(int newSocket){
             response = store.get(key) + "\n";
         } 
         else if (command == "SET" && ss >> key >> value) {
-            store.put(key, value);
+            int ttl = 0;
+            if(ss >> ttl){
+                store.put(key, value, ttl);
+            }
+            else{
+                store.put(key, value, 0);
+            }
+            
             response = "OK\n";
         } 
         else if(command == "DEL" && ss >> key >> value){
