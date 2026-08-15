@@ -41,7 +41,7 @@ void HashIndex::put(string key, string value, int ttlInSeconds){
     store[key] = value;
 
     if(ttlInSeconds > 0){
-        expiryStore[key] == chrono::steady_clock::now() + chrono::seconds(ttlInSeconds);
+        expiryStore[key] = chrono::steady_clock::now() + chrono::seconds(ttlInSeconds);
     }
     else{
         expiryStore.erase(key);
@@ -52,14 +52,14 @@ string HashIndex::get(string key){
     lock_guard<mutex> lock(mtx);
     
     if(store.find(key) == store.end()){
-        return "Key not found";
+        return "NOT_FOUND";
     }
 
     if(expiryStore.find(key) != expiryStore.end()){
         if(chrono::steady_clock::now() > expiryStore[key]){
             store.erase(key);
             expiryStore.erase(key);
-            return "NOT_FOUND (Expired)";
+            return "NOT_FOUND";
         }
     }
     return store[key];
