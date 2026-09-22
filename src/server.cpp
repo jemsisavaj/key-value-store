@@ -36,7 +36,7 @@ void Server::handleClient(int newSocket){
             
             response = "OK\n";
         } 
-        else if(command == "DEL" && ss >> key >> value){
+        else if(command == "DEL" && ss >> key){
             store.del(key);
             response = "DELETED\n";
         }

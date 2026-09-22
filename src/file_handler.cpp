@@ -67,3 +67,16 @@ bool FileHandler::rewriteAllRecords(const vector<pair<string, string>>& records)
     writeStream.open(filePath, ios::out | ios::app);
     return true;
 }
+
+bool FileHandler::appendDeleteRecord(const string& key){
+    lock_guard<mutex> lock(mtx);
+
+    if(!writeStream.is_open()){
+        return false;
+    }
+
+    // "__DELETED__" માર્કર ફાઇલમાં સ્ટોર થશે
+    writeStream << key << "|__DELETED__\n";
+    writeStream.flush();
+    return true;
+}

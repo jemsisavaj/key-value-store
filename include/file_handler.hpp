@@ -24,6 +24,8 @@ public:
     vector<pair<string,string>> readAllRecords();
 
     bool rewriteAllRecords(const vector<pair<string, string>>& records);
+
+    bool appendDeleteRecord(const string& key);
 };
 
 #endif

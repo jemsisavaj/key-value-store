@@ -5,7 +5,11 @@ using namespace std;
 KeyValueStore::KeyValueStore(const string& filename) : diskStore(filename){
     auto records = diskStore.readAllRecords();
     for(const auto& pair : records){
-        memoryStore.put(pair.first, pair.second);
+       if(pair.second == "__DELETED__"){
+            memoryStore.del(pair.first);
+        } else {
+            memoryStore.put(pair.first, pair.second);
+        }
     }
 }
 
@@ -20,6 +24,7 @@ string KeyValueStore::get(const string& key){
 
 void KeyValueStore::del(const string& key){
     memoryStore.del(key);
+    diskStore.appendDeleteRecord(key);
 }
 
 void KeyValueStore::compact(){
